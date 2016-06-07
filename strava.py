@@ -12,7 +12,7 @@ root.withdraw()
 
 cwd = os.getcwd()
 
-inputFile = filedialog.askopenfile(parent=root, initialdir=cwd, title='Please select a TCX File')
+inputFile = filedialog.askopenfile(parent=root, initialdir=cwd, title='Please select a TCX File', filetypes = [("TCX files","*.tcx")])
 if inputFile is None:
     exit('no file selected')
 
