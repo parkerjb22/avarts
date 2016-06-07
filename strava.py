@@ -16,7 +16,6 @@ inputFile = filedialog.askopenfile(parent=root, initialdir=cwd, title='Please se
 if inputFile is None:
     exit('no file selected')
 
-
 ET.register_namespace('', "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2")
 ET.register_namespace('TPX', "http://www.garmin.com/xmlschemas/UserProfile/v2")
 tree = ET.parse(inputFile)
