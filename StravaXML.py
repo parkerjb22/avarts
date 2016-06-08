@@ -2,6 +2,7 @@ __author__ = 'JuParker'
 
 import datetime
 import math
+import sys
 from geopy.distance import vincenty
 
 _prefix = "{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}"
@@ -13,32 +14,46 @@ def printDistAndPace(root):
     prevTime = 0.0
     timeObj, timeStart, totalFeet = 0, 0, 0
 
-
     for lap in root.iter(_prefix + "Trackpoint"):
-        try:
-            timeTag = lap.find(_prefix + "Time")
-            timeObj = datetime.datetime.strptime(timeTag.text, _dateFormat)
+        timeTag = lap.find(_prefix + "Time")
+        timeObj = datetime.datetime.strptime(timeTag.text, _dateFormat)
 
-            posTag = lap.find(_prefix + "Position")
-            latLon = (posTag.find(_prefix + "LatitudeDegrees").text, posTag.find(_prefix + "LongitudeDegrees").text)
+        posTag = lap.find(_prefix + "Position")
 
-            if prevTime is not 0.0:
-                v = vincenty(prev, latLon)
-                if totalFeet == 0:
-                    totalFeet = v
-                else:
-                    totalFeet += v
+        if posTag is None:
+            continue
+
+        latLon = (posTag.find(_prefix + "LatitudeDegrees").text, posTag.find(_prefix + "LongitudeDegrees").text)
+
+        if prevTime is not 0.0:
+            v = vincenty(prev, latLon)
+            if totalFeet == 0:
+                totalFeet = v
             else:
-                timeStart = timeObj
+                totalFeet += v
+        else:
+            timeStart = timeObj
 
-            prevTime = timeObj
-            prev = latLon
-        except:
-            pass
+        prevTime = timeObj
+        prev = latLon
 
     td = timeObj - timeStart
-    pace = td.seconds/totalFeet.miles/60
-    paceMin = math.floor(pace)
-    paceSec = round((pace - paceMin) * 60)
-    print('Distance:'.ljust(10), round(totalFeet.miles, 2))
-    print('Time:'.ljust(10), '%s:%s' % (paceMin, paceSec))
+
+    printOutput(td.seconds, totalFeet.miles)
+
+def convertToMinSec(secs):
+    min = math.floor(secs/60)
+    sec = round(secs % 60)
+    return '%s:%s' % (min, sec)
+
+def getOutput(msg, val):
+    return '{0: <10}{1: >8}\n'.format(msg, val)
+
+def printOutput(seconds, miles, out=sys.stdout):
+    pace = convertToMinSec(seconds/miles)
+    total = convertToMinSec(seconds)
+    dist = round(miles, 2)
+
+    out.write(getOutput('Time:', total))
+    out.write(getOutput('Distance:', dist))
+    out.write(getOutput('Pace:', pace))
