@@ -2,7 +2,7 @@ __author__ = 'parkerjb22'
 
 
 import xml.etree.ElementTree as ET
-import StravaXML
+from StravaXML import StravaXML
 import tkinter
 from tkinter import filedialog
 import os
@@ -21,4 +21,5 @@ ET.register_namespace('TPX', "http://www.garmin.com/xmlschemas/UserProfile/v2")
 tree = ET.parse(inputFile)
 root = tree.getroot()
 
-StravaXML.printDistAndPace(root)
+s = StravaXML(root)
+s.printDistAndPace()
