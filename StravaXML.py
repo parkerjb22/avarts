@@ -40,5 +40,5 @@ def printDistAndPace(root):
     pace = td.seconds/totalFeet.miles/60
     paceMin = math.floor(pace)
     paceSec = round((pace - paceMin) * 60)
-    print('Distance: %s' % round(totalFeet.miles, 2))
-    print("Time: %s:%s" % (paceMin, paceSec))
+    print('Distance:'.ljust(10), round(totalFeet.miles, 2))
+    print('Time:'.ljust(10), '%s:%s' % (paceMin, paceSec))
