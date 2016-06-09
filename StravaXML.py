@@ -52,14 +52,14 @@ class StravaXML:
         return '%s:%s' % (min, sec)
 
     def getOutput(self, msg, val):
-        return '{0: <10}{1: >8}\n'.format(msg, val)
+        return '{0: <10}{1: >8}'.format(msg, val)
 
-    def printOutput(self, seconds, miles, out=sys.stdout):
+    def printOutput(self, seconds, miles):
 
         pace = self.convertToMinSec(seconds/miles)
         total = self.convertToMinSec(seconds)
         dist = round(miles, 2)
 
-        out.write(self.getOutput('Time:', total))
-        out.write(self.getOutput('Distance:', dist))
-        out.write(self.getOutput('Pace:', pace))
+        print(self.getOutput('Time:', total))
+        print(self.getOutput('Distance:', dist))
+        print(self.getOutput('Pace:', pace))
