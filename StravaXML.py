@@ -2,7 +2,6 @@ __author__ = 'JuParker'
 
 import datetime
 import math
-import sys
 from geopy.distance import vincenty
 
 _prefix = "{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}"
@@ -15,9 +14,8 @@ class StravaXML:
 
     def printDistAndPace(self):
 
-        prev = (0.0, 0.0)
-        prevTime = 0.0
-        timeObj, timeStart, totalFeet = 0, 0, 0
+        timeObj, timeStart = None, None
+        points = []
 
         for lap in self.root.iter(_prefix + "Trackpoint"):
             timeTag = lap.find(_prefix + "Time")
@@ -28,24 +26,18 @@ class StravaXML:
             if posTag is None:
                 continue
 
-            latLon = (posTag.find(_prefix + "LatitudeDegrees").text, posTag.find(_prefix + "LongitudeDegrees").text)
+            points.append((posTag.find(_prefix + "LatitudeDegrees").text, posTag.find(_prefix + "LongitudeDegrees").text))
 
-            if prevTime is not 0.0:
-                v = vincenty(prev, latLon)
-                if totalFeet == 0:
-                    totalFeet = v
-                else:
-                    totalFeet += v
-            else:
+            if timeStart is None:
                 timeStart = timeObj
 
-            prevTime = timeObj
-            prev = latLon
-
         td = timeObj - timeStart
+        totalMiles = self.getMiles(points)
+        self.printOutput(td.seconds, totalMiles)
 
-        self.printOutput(td.seconds, totalFeet.miles)
-
+    def getMiles(self, points):
+        dist = [vincenty(x,y).miles  for (x, y) in zip(points[:-1], points[1:])]
+        return sum(dist)
     def convertToMinSec(self, secs):
         min = math.floor(secs/60)
         sec = round(secs % 60)
