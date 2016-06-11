@@ -1,7 +1,8 @@
 __author__ = 'JuParker'
 
-import datetime
 import math
+import xml.etree.ElementTree as ET
+from datetime import datetime
 from geopy.distance import vincenty
 
 _prefix = "{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}"
@@ -9,35 +10,40 @@ _dateFormat = "%Y-%m-%dT%H:%M:%S.000Z"
 
 class StravaXML:
 
-    def __init__(self, root=None):
-        self.root = root
+    def __init__(self, inputFile=None):
+        if inputFile is not None:
+            ET.register_namespace('', 'http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2')
+            ET.register_namespace('TPX', "http://www.garmin.com/xmlschemas/UserProfile/v2")
+            tree = ET.parse(inputFile)
+            root = tree.getroot()
+            self.root = root
 
     def printDistAndPace(self):
-
-        timeObj, timeStart = None, None
         points = []
 
         for lap in self.root.iter(_prefix + "Trackpoint"):
-            timeTag = lap.find(_prefix + "Time")
-            timeObj = datetime.datetime.strptime(timeTag.text, _dateFormat)
 
             posTag = lap.find(_prefix + "Position")
 
             if posTag is None:
                 continue
 
-            points.append((posTag.find(_prefix + "LatitudeDegrees").text, posTag.find(_prefix + "LongitudeDegrees").text))
+            lat = posTag.find(_prefix + "LatitudeDegrees").text
+            lon = posTag.find(_prefix + "LongitudeDegrees").text
 
-            if timeStart is None:
-                timeStart = timeObj
+            time = lap.find(_prefix + "Time").text
+            timeObj = datetime.strptime(time, _dateFormat)
 
-        td = timeObj - timeStart
+            points.append( ((lat, lon), timeObj) )
+
+        td = points[-1][1] - points[0][1]
         totalMiles = self.getMiles(points)
         self.printOutput(td.seconds, totalMiles)
 
     def getMiles(self, points):
-        dist = [vincenty(x,y).miles  for (x, y) in zip(points[:-1], points[1:])]
+        dist = [vincenty(x[0],y[0]).miles  for (x, y) in zip(points[:-1], points[1:])]
         return sum(dist)
+
     def convertToMinSec(self, secs):
         min = math.floor(secs/60)
         sec = round(secs % 60)

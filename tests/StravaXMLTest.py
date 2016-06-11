@@ -4,8 +4,6 @@ from unittest import TestCase
 from unittest.mock import patch
 from StravaXML import StravaXML
 from io import StringIO
-from geopy.distance import vincenty
-
 
 class StravaXMLTest(TestCase):
 
@@ -34,7 +32,11 @@ class StravaXMLTest(TestCase):
         self.assertEqual(expected, mock_stdout.getvalue())
 
     def test_getMiles(self):
-        myList = [(33.449885454028845, -86.81012249551713), (33.44981093890965, -86.81014596484601), (33.449710523709655, -86.81016624905169)]
+        myList = [
+            ((33.449885454028845, -86.81012249551713), ''),
+            ((33.44981093890965, -86.81014596484601), ''),
+            ((33.449710523709655, -86.81016624905169), '')
+        ]
         self.assertEqual(0.01233031270241276, self.s.getMiles(myList))
 
     # def test_split(self):
