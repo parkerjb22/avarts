@@ -2,7 +2,7 @@ __author__ = 'juparker'
 
 from unittest import TestCase
 from unittest.mock import patch
-from StravaXML import StravaXML
+from StravaXML import StravaXML, _dateFormat, datetime, vincenty, timedelta
 from io import StringIO
 
 class StravaXMLTest(TestCase):
@@ -39,9 +39,18 @@ class StravaXMLTest(TestCase):
         ]
         self.assertEqual(0.01233031270241276, self.s.getMiles(myList))
 
-    # def test_split(self):
-    #     s = 'hello world'
-    #     self.assertEqual(s.split(), ['hello', 'world'])
-    #     # check that s.split fails when the separator is not a string
-    #     with self.assertRaises(TypeError):
-    #         s.split(2)
+    def test_newDegrees(self):
+        self.assertEqual(90, self.s.newDegrees(90, chance=100))
+        self.assertEqual(95, self.s.newDegrees(90, chance=500))
+        self.assertEqual(85, self.s.newDegrees(90, chance=750))
+        self.assertEqual(-90, self.s.newDegrees(90, chance=1000))
+
+    def test_newPoint(self):
+        timeObj = datetime.strptime('2016-03-01T11:39:06.000Z', _dateFormat)
+        point = ((33.449885454028845, -86.81012249551713), timeObj)
+        mdist = 15
+        bearing = 90
+        newPoint = self.s.newPoint(point, mdist, bearing)
+        v = vincenty(point[0], newPoint[0])
+        self.assertAlmostEqual(mdist, v.meters, 5)
+        self.assertEqual(timedelta(0, 4), newPoint[1] - timeObj)

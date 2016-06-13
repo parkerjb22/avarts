@@ -1,19 +1,18 @@
 __author__ = 'parkerjb22'
 
 
-from StravaXML import StravaXML
-import tkinter
-from tkinter import filedialog
-import os
+from StravaXML import StravaXML, _dateFormat, datetime, timedelta
+from tkinter import filedialog, Tk
 
-root = tkinter.Tk()
+root = Tk()
 root.withdraw()
 
-cwd = os.getcwd()
+dirName = filedialog.askdirectory(parent=root,initialdir="/",title='Please select a directory')
+if dirName is None:
+    exit('no directory selected')
 
-inputFile = filedialog.askopenfile(parent=root, initialdir=cwd, title='Please select a TCX File', filetypes = [("TCX files","*.tcx")])
-if inputFile is None:
-    exit('no file selected')
-
-s = StravaXML(inputFile)
-s.printDistAndPace()
+s = StravaXML()
+timeObj = datetime.strptime('2016-03-01T11:39:06.000Z', _dateFormat)
+for x in range(0, 25):
+    s.createRoute(5.0, timeObj, dirName)
+    timeObj += timedelta(days=1)
