@@ -3,13 +3,41 @@ __author__ = 'juparker'
 from unittest import TestCase
 from unittest.mock import patch
 from io import StringIO
-
+from xml.etree import ElementTree as ET
 from lib.StravaXML import StravaXML, _dateFormat, datetime, vincenty, timedelta
 
 
 class StravaXMLTest(TestCase):
 
     s = StravaXML()
+
+
+    def test_createPoint(self):
+        root = ET.Element("root")
+        point = ((33.449885454028845, -86.81012249551713), datetime.strptime('2016-03-01T11:39:06.000Z', _dateFormat))
+        dist = 5
+        self.s.createPoint(root, point, dist)
+        actual = ET.tostring(root)
+        expected = b'<root><Trackpoint><Time>2016-03-01T11:39:06.000Z</Time><Position><LatitudeDegrees>33.44988545402884</LatitudeDegrees><LongitudeDegrees>-86.81012249551713</LongitudeDegrees></Position><DistanceMeters>5.00000</DistanceMeters></Trackpoint></root>'
+        self.assertEquals(expected, actual)
+
+    def test_setupTrack(self):
+        root = ET.Element("root")
+        startTime = '2016-03-01T11:39:06.000Z'
+        self.s.setupTrack(root, startTime)
+        actual = ET.tostring(root)
+        expected = b'<root><Activities><Activity Sport="Running"><Id>2016-03-01T11:39:06.000Z</Id><Lap StartTime="2016-03-01T11:39:06.000Z"><TotalTimeSeconds>515.26</TotalTimeSeconds><DistanceMeters>1610.719970703125</DistanceMeters><Track /></Lap></Activity></Activities></root>'
+        self.assertEquals(expected, actual)
+
+    def setupTrack(self, root, startTime):
+        activities = ET.SubElement(root, "Activities")
+        activity = ET.SubElement(activities, "Activity", Sport="Running")
+        ET.SubElement(activity, "Id").text = startTime
+        lap = ET.SubElement(activity, "Lap", StartTime=startTime)
+        ET.SubElement(lap, "TotalTimeSeconds", ).text = "515.26"
+        ET.SubElement(lap, "DistanceMeters", ).text = "1610.719970703125"
+        track = ET.SubElement(lap, "Track")
+        return track
 
     def test_getOutput(self):
         self.assertEqual('longwords 00:12:12', self.s.getOutput('longwords', '00:12:12'))

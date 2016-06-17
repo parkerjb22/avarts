@@ -1,11 +1,11 @@
 __author__ = 'JuParker'
 
 import math
-import xml.etree.ElementTree as ET
+import random
+from xml.etree import ElementTree as ET
 from datetime import datetime, timedelta
 from geopy.distance import vincenty, VincentyDistance, Point
 from xml.dom import minidom
-import random
 
 _defaultPrefix = "{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}"
 _dateFormat = "%Y-%m-%dT%H:%M:%S.000Z"
