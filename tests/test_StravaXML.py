@@ -2,8 +2,10 @@ __author__ = 'juparker'
 
 from unittest import TestCase
 from unittest.mock import patch
-from StravaXML import StravaXML, _dateFormat, datetime, vincenty, timedelta
 from io import StringIO
+
+from lib.StravaXML import StravaXML, _dateFormat, datetime, vincenty, timedelta
+
 
 class StravaXMLTest(TestCase):
 

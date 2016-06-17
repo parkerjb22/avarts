@@ -1,8 +1,8 @@
 __author__ = 'parkerjb22'
 
-
-from StravaXML import StravaXML, _dateFormat, datetime, timedelta
 from tkinter import filedialog, Tk
+
+from lib.StravaXML import StravaXML, _dateFormat, datetime, timedelta
 
 root = Tk()
 root.withdraw()
