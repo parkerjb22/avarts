@@ -3,10 +3,7 @@ node {
    sh "git reset --hard HEAD"
    sh "git clean -f -d -x"
 
-   // Mark the code checkout 'stage'....
    stage 'Checkout'
-
-   // Get some code from a GitHub repository
    git url: 'https://github.com/parkerjb22/avarts.git'
 
    stage 'Unit tests'
