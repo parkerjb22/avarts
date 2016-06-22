@@ -1,8 +1,4 @@
 node {
-   stage 'Clean'
-   sh "git reset --hard HEAD"
-   sh "git clean -f -d -x"
-
    stage 'Checkout'
    git url: 'https://github.com/parkerjb22/avarts.git'
 
